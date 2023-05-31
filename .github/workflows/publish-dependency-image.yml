@@ -40,6 +40,6 @@ jobs:
         with:
           context: .
           push: true
-          file: ./Dependency-analysis.dockerfile
+          file: Dockerfile
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
