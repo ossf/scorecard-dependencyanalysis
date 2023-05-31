@@ -1,9 +1,9 @@
-name: Publish Dependency Analysis Docker image
+name: Publish Image
 
 on:
   push:
-    branches:
-      - dependency-analysis
+    branches: 
+      - dependency-analysis  
     tags:
       - 'v*'
 
