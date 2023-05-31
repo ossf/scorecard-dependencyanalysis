@@ -1,82 +1,58 @@
-# **OSSF Project/WG Name**
+# OpenSSF Scorecard Dependency Analysis
 
-[Brief description of the initiative]
+This repository contains the source code for the OpenSSF Dependency Analysis project. The aim of the project is to check the security posture of a project's dependencies using the [GitHub Dependency Graph API](https://docs.github.com/en/rest/dependency-graph/dependency-review?apiVersion=2022-11-28#get-a-diff-of-the-dependencies-between-commits) and the [Security Scorecards API](https://api.securityscorecards.dev).
 
+## Usage
+The OpenSSF Dependency Analysis is a GitHub Action that can be easily incorporated into a workflow. 
+The workflow can be triggered on a pull request event. 
+The action will run on the latest commit on the default branch of the repository, and will create a comment on the pull request with the results of the analysis. 
+An example of the comment can be found [here](https://github.com/ossf-tests/vulpy/pull/2#issuecomment-1442310469).
 
-## 
-**Motivation**
+## Prerequisites
+The actions require enabling the [GitHub Dependency Review](https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review) for the repository.
 
-[Background / use cases of the problem to be solved]
+### Configuration
+The action can be configured using the following inputs:
 
+- `SCORECARD_CHECKS`: This environment variable takes a file containing a list of checks to run. 
+- The file should be in JSON format and follow the format provided by the [Scorecard checks documentation](https://github.com/ossf/scorecard/blob/main/docs/checks.md). For example:
+```json
+[
+  "Binary-Artifacts",
+  "Pinned-Dependencies"
+] 
+```
 
-## 
-**Objective**
+### Installation
+The action can be installed by adding the following snippet to the workflow file:
+```yaml
+name: scorecard-dependency-analysis
 
-[What is to be achieved with this initiative]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  pull-requests: write # Required to create a comment on the pull request.
 
-[OKRs - OPTIONAL]
-
-
-## 
-**Scope**
-
-[What is in and out of scope]
-
-
-## 
-**Prior Work**
-
-
-
-*   List of prior and/or related projects
-
-# 
-**Get Involved**
-
-*   Official communications occur on the [ADD LINK TO YOUR WG MAILING LIST] (ex: https://lists.openssf.org/g/openssf-tac/topics).  \
-[Manage your subscriptions to Open SSF mailing lists](https://lists.openssf.org/g/main/subgroups).
-*   [Add Slack information if availabable]
-
-### 
-Quick Start
-
-*   Areas that need contributions
-*   Build information if applicable
-*   Where to file issues
-*   Etc.
-
-## 
-**Meeting times**
-
-[TODO: Update with your WG meeting details]
-*   Every other Tuesday @ 10:00am PST (Link to calendar invite)
-*   [Meeting Minutes](https://docs.google.com/document/d/1uXQI1vI5_HyOvxHMexrnTY_ruBrynbPl5yOd1UM4g3A/edit#heading=h.yworp6sxzb6g)
-
-# 
-**Governance**
-
-[TODO: Update this link to your specific CHARTER.md file]
-The [CHARTER.md](https://github.com/ossf/project-template/blob/main/CHARTER.md) outlines the scope and governance of our group activities.
+jobs:
+  dependency-analysis:
+    name: Scorecards dependency analysis
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PR_NUMBER: ${{ github.event.number }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+      GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+      GITHUB_SHA: ${{ github.sha }}
+      GITHUB_ACTOR: ${{ github.actor }}
 
 
-[OPTIONAL]
-*   Lead name 
-*   Co-Lead name
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
 
-#
-**Intellectual Property**
-
-In accordance with the [OpenSSF Charter (PDF)](https://charter.openssf.org/), work produced by this group is licensed as follows:
-
-[TODO: Select below the applicable license(s), delete those that don't apply, and update the LICENSE file accordingly. For specification development refer to the specific instructions on the [Community Specification Getting Started page](https://github.com/CommunitySpecification/1.0/blob/main/..Getting%20Started.md).
-
-Note that for source code, instead of Apache, you may choose to use the MIT License available at https://opensource.org/licenses/MIT. Otherwise, no other license than those listed here may be used without approval from the Governing Board.]
-
-1. Software source code
-* Apache License, Version 2.0, available at https://www.apache.org/licenses/LICENSE-2.0;
-2. Data
-* Any of the Community Data License Agreements, available at https://www.cdla.io;
-3. Specifications
-* Community Specification License, Version 1.0, available at https://github.com/CommunitySpecification/1.0
-4. All other Documentation
-* Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/
+      - name: Run dependency analysis
+        uses: ossf/scorecard-action/dependency-analysis@main # Replace with the latest release version.
+```
