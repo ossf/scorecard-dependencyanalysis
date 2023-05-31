@@ -1,4 +1,5 @@
 name: Publish Dependency Analysis Docker image
+
 on:
   push:
     branches:
