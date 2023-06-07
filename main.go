@@ -299,6 +299,7 @@ func GetDependencyDiff(owner, repo, token, base, head string) ([]DependencyDiff,
 func GetGitHubDependencyDiff(owner, repo, token, base, head string) (*http.Response, error) {
 	req, err := http.NewRequest("GET",
 		fmt.Sprintf("https://api.github.com/repos/%s/%s/dependency-graph/compare/%s...%s", owner, repo, base, head), nil)
+	log.Println(req.URL.String())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 		// handle err
