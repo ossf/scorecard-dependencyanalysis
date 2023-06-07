@@ -56,6 +56,7 @@ func main() {
 	owner := ownerRepo[0]
 	repo = ownerRepo[1]
 	checks, err := GetScorecardChecks(fileName)
+	log.Println("checks", checks)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -104,6 +105,7 @@ func main() {
 	}
 	// create or update comment
 	if vulnerabilities == "" && result == "" {
+		log.Println("no vulnerabilities and no scorecard results")
 		return
 	}
 	if err := createOrUpdateComment(
@@ -209,6 +211,7 @@ func createOrUpdateComment(client *github.Client, owner, githubUser, repo string
 // GitHubIssueComment returns a markdown string for a GitHub issue comment.
 func GitHubIssueComment(checks *ScorecardResult) string {
 	if checks.Repo.Name == "" {
+		log.Println("no checks")
 		return ""
 	}
 	sb := strings.Builder{}
