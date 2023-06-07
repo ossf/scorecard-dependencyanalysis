@@ -78,10 +78,12 @@ func main() {
 	for _, dep := range diff { //nolint:gocritic
 		m[dep.SourceRepositoryURL] = dep
 	}
+	log.Println("dependency diff", m)
 
 	for k, i := range m { //nolint:gocritic
 		url := strings.TrimPrefix(k, "https://")
 		scorecard, err := GetScorecardResult(url)
+		log.Printf("scorecard result for %s: %+v\n", url, scorecard)
 		if err != nil {
 			if len(i.Vulnerabilities) > 0 {
 				vulnerabilities = GetVulnsHTML(i, vulnerabilities)
