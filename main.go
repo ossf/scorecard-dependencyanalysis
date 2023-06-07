@@ -24,6 +24,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -31,6 +32,14 @@ import (
 	"golang.org/x/oauth2"
 )
 
+func extractPRNumber(ref string) string {
+	re := regexp.MustCompile(`refs/pull/(\d+)/merge`)
+	matches := re.FindStringSubmatch(ref)
+	if len(matches) > 1 {
+		return matches[1]
+	}
+	return ""
+}
 func main() {
 	vulnerabilities := ""
 	result := ""
@@ -38,8 +47,7 @@ func main() {
 	repo := os.Getenv("GITHUB_REPOSITORY")
 	commitSHA := os.Getenv("GITHUB_SHA")
 	token := os.Getenv("GITHUB_TOKEN")
-	ref := os.Getenv("GITHUB_REF")
-	pr := strings.TrimPrefix(ref, "refs/pull/")
+	pr := extractPRNumber(os.Getenv("GITHUB_REF"))
 	ghUser := os.Getenv("GITHUB_ACTOR")
 	fileName := os.Getenv("SCORECARD_CHECKS")
 	if err := Validate(token, repo, commitSHA, pr); err != nil {
