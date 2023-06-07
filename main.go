@@ -16,6 +16,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -267,6 +268,16 @@ func GetDependencyDiff(owner, repo, token, base, head string) ([]DependencyDiff,
 	if err != nil {
 		return data, fmt.Errorf("failed to get dependency diff: %w", err)
 	}
+
+	// print the repnose body for debugging
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return data, fmt.Errorf("failed to read response body: %w", err)
+	}
+	fmt.Println(string(body))
+	// also decode the response body
+	// reset the body
+	resp.Body = ioutil.NopCloser(bytes.NewBuffer(body)) //nolint:staticcheck
 
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
