@@ -38,7 +38,8 @@ func main() {
 	repo := os.Getenv("GITHUB_REPOSITORY")
 	commitSHA := os.Getenv("GITHUB_SHA")
 	token := os.Getenv("GITHUB_TOKEN")
-	pr := os.Getenv("GITHUB_PR_NUMBER")
+	ref := os.Getenv("GITHUB_REF")
+	pr := strings.TrimPrefix(ref, "refs/pull/")
 	ghUser := os.Getenv("GITHUB_ACTOR")
 	fileName := os.Getenv("SCORECARD_CHECKS")
 	if err := Validate(token, repo, commitSHA, pr); err != nil {
